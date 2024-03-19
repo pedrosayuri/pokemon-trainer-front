@@ -53,10 +53,23 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 interface NavbarProps {
-  handleSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  page: string;
+  isSearch?: boolean;
+  handleSearchChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ handleSearchChange }) => {
+const Navbar: React.FC<NavbarProps> = ({ handleSearchChange, page, isSearch }) => {
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.href = '/';
+  }
+
+  const handlerChangePage = () => {
+    if (page === 'Home') window.location.href = '/home';
+    if (page === 'Team') window.location.href = '/team';
+  }
+
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);
@@ -98,8 +111,8 @@ const Navbar: React.FC<NavbarProps> = ({ handleSearchChange }) => {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Perfil</MenuItem>
-      <MenuItem onClick={handleMenuClose}>Sair</MenuItem>
+      <MenuItem onClick={handlerChangePage}>{page}</MenuItem>
+      <MenuItem onClick={handleLogout}>Sair</MenuItem>
     </Menu>
   );
 
@@ -156,16 +169,18 @@ const Navbar: React.FC<NavbarProps> = ({ handleSearchChange }) => {
           >
             Pokédex
           </Typography>
-          <Search onChange={handleSearchChange}>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ 'aria-label': 'search' }}
-              onChange={handleSearchChange}
-            />
-          </Search>
+          {isSearch && (
+            <Search onChange={handleSearchChange}>
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder="Search…"
+                inputProps={{ 'aria-label': 'search' }}
+                onChange={handleSearchChange}
+              />
+            </Search>
+          )}
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             <IconButton

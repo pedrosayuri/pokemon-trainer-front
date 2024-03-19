@@ -10,17 +10,9 @@ export function Home() {
   const [searchPokemon, setSearchPokemon] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    getPokemons();
-  }, []);
-
-  useEffect(() => {
-    pokemonFilter(searchPokemon);
-  }, [searchPokemon]);
-
   const getPokemons = async () => {
     try {
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmMzFhNjkzNS0wYTg3LTQ4MzctODlkOS1jMWZjOWVkOTI0NTUiLCJpYXQiOjE3MTA4MDc0NzV9.-s14Hl6q2RkHm2EPjaCOouOstXkDbd6OTJzDKEC1j44";
+      const token = localStorage.getItem('token');
       const response = await axios.get("http://192.168.0.101:3333/pokemon/listAll", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -35,42 +27,45 @@ export function Home() {
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.value === "") {
-        getPokemons();  
+      getPokemons();  
     } else {
-        setSearchPokemon(event.target.value);
-    }
-        
+      setSearchPokemon(event.target.value);
+    }   
   };
 
   const pokemonFilter = async (searchPokemon: string) => {
     try {
-        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmMzFhNjkzNS0wYTg3LTQ4MzctODlkOS1jMWZjOWVkOTI0NTUiLCJpYXQiOjE3MTA4MDc0NzV9.-s14Hl6q2RkHm2EPjaCOouOstXkDbd6OTJzDKEC1j44";
-        const response = await axios.post("http://192.168.0.101:3333/pokemon/listByNameAndTypes", {
+      const token = localStorage.getItem('token');
+      const response = await axios.post("http://192.168.0.101:3333/pokemon/listByNameAndTypes", {
         name: searchPokemon
-        }, {
+      }, {
         headers: {
-            Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         }
-        });
+      });
 
-        setPokemons(response.data);
-        setError(null);
+      setPokemons(response.data);
+      setError(null);
     } catch (error) {
-        console.error("Erro ao buscar pokemons:", error);
-        setError("Não foi encontrado nenhum Pokémon na pokédex com o nome inserido.");
-        setPokemons([]);
+      console.error("Erro ao buscar pokemons:", error);
+      setError("Não foi encontrado nenhum Pokémon na pokédex com o nome inserido.");
+      setPokemons([]);
     }
   }
 
   useEffect(() => {
-    console.log("pokemons", pokemons);
-  }, [pokemons]);
+    getPokemons();
+  }, []);
+
+  useEffect(() => {
+    pokemonFilter(searchPokemon);
+  }, [searchPokemon]);
 
   return (
     <div>
-      <Navbar handleSearchChange={handleSearchChange} />
+      <Navbar handleSearchChange={handleSearchChange} page="Team" isSearch/>
       <Container maxWidth="xl">
-        {error ? (
+        {error && pokemons.length === 0 ? (
           <Typography variant="h6" color="error" align="center" style={{ marginTop: "2rem" }}>
             {error}
           </Typography>
