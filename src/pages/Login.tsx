@@ -1,10 +1,10 @@
 import { z } from 'zod';
 import axios from 'axios';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { Container, Typography, TextField, Button, Grid } from '@mui/material';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
 
 const schema = z.object({
   username: z.string().min(3).max(20),
@@ -23,6 +23,8 @@ export function Login() {
 
     const [error, setError] = useState<string | null>(null);
 
+    const navigate = useNavigate();
+
     const onSubmit: SubmitHandler<FormData> = async (data) => {
         try {
           const response = await axios.post("http://192.168.0.101:3333/sessions", {
@@ -31,7 +33,7 @@ export function Login() {
           });
             const token = response.data.token;
             localStorage.setItem('token', token);
-            window.location.href = '/home';
+            navigate('/home');
           setError(null);
         } catch (error) {
           setError('Erro ao fazer login. Por favor, tente novamente.');
